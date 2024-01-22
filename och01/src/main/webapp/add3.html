@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<!--자바스크립트 사용-->
+<!--입력된 파라미터 체크할때-->
+<script type="text/javascript">
+	function chk() {
+		
+		if ( ! frm.num.value) {
+			alert("숫자를 입력하세요.");
+			frm.num.focus();		// focus() : 커서가 그쪽으로 자동으로 감
+			return false;
+		}
+		
+		if (isNaN(frm.num.value)) {
+			alert ("숫자가 아님!");
+			frm.num.focus();
+			frm.num.value = "";	// 잘못 입력된 글자 지우기
+			return false;
+		}
+		
+	return true;
+	}
+</script>
+
+</head>
+<body>
+	<h1>숫자를 입력하세요</h1>
+	
+	<form action="Add3" name="frm" onsubmit="return chk()" method="get">
+	<!--action을 취한다.(Servlet을 찾아간다.) 그 전에 onsubmit을 한다.-->
+	<!--method default : GET 방식-->
+	
+			<!-- 주석 단축키 : Ctrl + Shift + / -->
+			<!-- p 태그, br 태그 : 줄바꿈 -->
+			숫자 : <input type="text" name="num"> <p>
+			위치 : <input type="text" name="loc"> <p>	
+					<input type="submit" value="확인">	
+	</form>
+	
+</body>
+</html>

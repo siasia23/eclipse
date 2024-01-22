@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script type="text/javascript">	
+// 우리는 <script>만 써도 됨. 버전에 따른 차이.
+	
+	function chk() {
+		
+		if ( ! frm.title.value ) {
+			alert ("제목이 없음!!");
+			frm.title.focus();
+			return false;
+		}
+		
+		if ( ! frm.writer.value ) {
+			alert ("작성자를 밝혀라!!");
+			frm.writer.focus();
+			return false;
+		}
+		
+		if ( ! frm.content.value ) {
+			alert ("내용을 써라!!");
+			frm.content.focus();
+			return false;
+		}
+		
+		return true;
+		// if 절에서 걸러낼거 다 걸러낸 후, 문제 없을때 action 정상 실행하기 위해 true 넣어줌
+	}
+	
+</script>
+</head>
+
+<body>
+	<h1>게시판</h1>
+	
+	<form action="Board" name="frm" method="post" onsubmit="return chk()">
+	<!--onsubmit : true여야 action이 실행됨-->
+	<!--onsubmit : false면 action 실행되지 않음-->
+	
+		<table border="1">
+		<!--테이블 보더 굵기 : 1-->
+			<tr>
+				<td>제목</td>
+				<td><input type="text" name="title"></td>
+			</tr>
+			<tr>
+				<td>작성자</td>
+				<td><input type="text" name="writer"></td>
+			</tr>
+			<tr>
+				<td>내용</td>
+				<td><textarea cols="40" rows="10" name="content"></textarea></td>
+			</tr>
+			<tr>
+				<td colspan="100"><input type="submit" value="완료"></td>
+			</tr>
+		</table>
+	</form>
+</body>
+</html>
