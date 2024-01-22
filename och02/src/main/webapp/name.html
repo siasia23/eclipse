@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script>
+	function chk() {
+		if ( ! frm.name.value ) {
+			alert ("이름이 뭐죠?");
+			frm.name.focus();
+			return false;
+		}
+		if ( ! frm.addr.value ) {
+			alert ("어디에 살죠?");
+			frm.addr.focus();
+			return false;
+		}
+		return true;
+	}
+</script>
+</head>
+<body>
+	<form action="Name" name="frm" onsubmit="return chk()">
+			<!--아래 name, addr이라는 파라미터를 가지고 서블릿 Name을 찾아간다.-->
+			이름 : <input type="text" name="name"><p>
+			주소 : <input type="text" name="addr"><p>
+			<input type="submit" value="입력완료">
+	</form>
+</body>
+</html>

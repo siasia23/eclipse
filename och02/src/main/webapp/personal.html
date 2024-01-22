@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>플젝에 쓸 웬만한 것들이 다 여기에 있음!!!</title>
+</head>
+
+<body>
+	<h2>개인정보 ***</h2>
+	
+	<form action="Person" method="post" name="frm" onsubmit="return chk()">
+		
+		<table border="1" bgcolor="yellow">
+			
+			<tr>
+				<td>이름</td>
+				<td><input type="text" name="name"></td>
+			</tr>
+			
+			<tr>
+				<td>아이디</td>
+				<td><input type="text" name="id"></td>
+			</tr>
+			
+			<tr>
+				<td>암호</td>
+				<td><input type="password" name="password"></td>
+			</tr>
+			
+			<tr>
+				<td>성별</td>
+				<td>
+					<!-- radio : 중복선택 불가 -->
+					남자<input type="radio" name="gender" checked="checked" value="남자"><br>
+					여자<input type="radio" name="gender" 								value="여자">
+				</td>
+			</tr>
+			
+			<tr>
+				<td>메일 수신</td>
+				<td>
+					<!-- checkbox : 중복선택 가능 > 선택된 값은 배열로 받아짐 -->
+					공지<input type="checkbox" name="notice" value="공지"><br>
+					광고<input type="checkbox" name="notice" value="광고"><br>
+					배송<input type="checkbox" name="notice" value="배송"><br>
+				</td>
+			</tr>
+			
+			<tr>
+				<td>직업</td>
+				<td>
+					<!-- 선택한 option value가 name 파라미터에 담김 -->
+					<select name="job">
+						<option value="가수">								가수</option>
+						<option value="장군" selected="selected">장군</option>
+						<option value="공무원">						공무원</option>
+					</select>
+				</td>
+			</tr>
+			
+			<tr>
+				<td><input type="submit" value="확인"></td>
+				<td><input type="reset" value="입력취소"></td>
+			</tr>
+			
+		</table>
+		
+	</form>
+</body>
+</html>
