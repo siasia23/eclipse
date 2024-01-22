@@ -1,0 +1,30 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+<!-- JSTL 삽입 -->    
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<!-- Java의 try-catch -->
+	<c:catch var="e1">
+		<%
+			int num1 = Integer.parseInt(request.getParameter("num1"));
+			int num2 = Integer.parseInt(request.getParameter("num2"));
+		%>	
+		나눗셈 결과 : <%=num1/num2 %>
+	</c:catch>
+	
+	<!-- Java의 if -->
+	<c:if test="${e1 != null }">
+		에러 메세지 : ${e1.message }
+	</c:if>
+
+</body>
+</html>
