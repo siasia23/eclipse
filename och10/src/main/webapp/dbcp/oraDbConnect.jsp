@@ -18,6 +18,8 @@
 	
 		Context init = new InitialContext();
 	
+		// java:comp/env/ 까지는 예약어
+		// jdbc/OracleDB : context.xml의 Resource name
 		DataSource ds = (DataSource) init.lookup("java:comp/env/jdbc/OracleDB");
 		
 		Connection conn = ds.getConnection();
