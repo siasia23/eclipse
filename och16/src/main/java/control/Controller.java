@@ -1,0 +1,174 @@
+package control;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import service.CommandProcess;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+
+/**
+ * Servlet implementation class Controller
+ */
+public class Controller extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	
+	// property key = String, value = Object
+	private Map<String, Object> commandMap = new HashMap<String, Object>();
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public Controller() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see Servlet#init(ServletConfig)
+	 */
+	public void init(ServletConfig config) throws ServletException {
+
+		// getInitParameter() : web.xml에서 propertyConfig에 해당하는 init-param의 값을 읽어옴
+		String props = config.getInitParameter("config");
+		System.out.println("1. init String props : " + props);
+		
+		// Properties = key + value
+		Properties pr = new Properties();
+		
+		FileInputStream f =null;
+		
+		try {
+			
+			// getRealPath() : 파라미터로 받은 파일의 metadata 가져옴
+			// 배포한 서버의 경로를 읽어들이기 위해?
+			String configFilePath = config.getServletContext().getRealPath(props);
+			System.out.println("2. init String configFilePath : " + configFilePath);
+			
+			// 가져온 경로와 metadata로 file 생성
+			f = new FileInputStream(configFilePath);
+			
+			// Memory Up
+				// key = /list.do
+				// value = service.ListAction
+			pr.load(f);
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			
+			if (f != null)
+				try {
+					
+					f.close();
+					
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+		}
+		
+		// pr.keySet() : 프로퍼티의 키들만 모아서
+		// 			/list.do /content.do
+		Iterator keyIter = pr.keySet().iterator();
+		
+		while (keyIter.hasNext()) {
+			
+			String command = (String) keyIter.next();			// 프로퍼티 key
+			String className = pr.getProperty(command);		// 프로퍼티 value		getProperty() : value 가져옴
+			System.out.println("3. init command : " + command);
+			System.out.println("4. init className : " + className);
+			
+			try {
+				
+				//  ListAction la = new ListAction();
+		        // 소멸 Class
+			//	Class  commandClass    = Class.forName(className);
+			//	Object commandInstance = commandClass.newInstance();
+				// new Class   --> 제네릭의 요점은 클래스 유형을 모른다
+				
+				// 해당 문자열을 클래스로 만드는 명령어
+				Class<?> commandClass = Class.forName(className);	
+				
+				// 서비스를 객체로 만든다.
+					// 여기서 의도한 것은 ListAction la = new ListAction();
+					// 하지만 실제 서비스는 여러 개일테니까 코드를 줄이기 위해 이 방식으로!
+				// .getDeclaredConstructor().newInstance() : 객체 만드는 메소드. jdbc 버전 올라가면서 메소드 바뀜 (api 참조)
+				CommandProcess commandInstance = 
+						(CommandProcess) commandClass.getDeclaredConstructor().newInstance();
+				
+							//          list.do    	service.ListAction
+							//         content.do  service.ContentAction
+				commandMap.put(command, commandInstance);
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		}
+	
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		requestServletPro(request, response);
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		requestServletPro(request, response);
+	}
+	
+	protected void requestServletPro(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		String view = null;
+		
+		// Interface
+		CommandProcess com = null;
+		
+		String command = request.getRequestURI();
+		System.out.println("1. requestServletPro command : " + command);
+		
+		// substring() : 불필요한 문자열 자르기
+		command = command.substring(request.getContextPath().length());
+		System.out.println("2. requestServletPro command substring : " + command);
+		
+		try {
+			
+			// service.ListAction Instance
+			com = (CommandProcess) commandMap.get(command);
+			System.out.println("3. requestServletPro command : " + command);
+			System.out.println("4. requestServletPro com : " + com);
+			
+			// View Page 얻기
+			view = com.requestPro(request, response);
+			System.out.println("5. requestServletPro view : " + view);
+			
+		} catch (Exception e) {
+			throw new ServletException(e);
+		}
+		
+		RequestDispatcher dispatcher = request.getRequestDispatcher(view);
+		dispatcher.forward(request, response);
+				
+	}
+
+}
