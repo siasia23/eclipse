@@ -3,6 +3,8 @@ package och12;
 import java.util.Date;
 
 // DTO
+
+// 역할 : 결과 테이블의 컬럼 정의
 public class Member2 {
 
 	private String id;

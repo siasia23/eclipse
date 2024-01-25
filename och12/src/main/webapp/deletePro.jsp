@@ -1,44 +1,51 @@
 <%@page import="och12.MemberDao"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8" errorPage="error.jsp"%>
+<%@ include file="memberCheck.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>로그인 프로세스 (나중에 서비스 로직으로 빠질 놈)</title>
+<title>회원정보 삭제(회원탈퇴) 프로세스</title>
 </head>
 <body>
+
 <%
 
-	String id = request.getParameter("id");
 	String passwd = request.getParameter("passwd");
-	
+
 	MemberDao md = MemberDao.getInstance();
 	
-	// 과제 2
-	int result = md.check(id, passwd);
+	System.out.println("DeletePro id : " + id);
 	
+	// 과제 4. delete() 완성
+	int result = md.delete(id, passwd);
+	
+	// id, pw 일치하면 return 1
 	if (result == 1) {
 		
-		session.setAttribute("id", id);
-		response.sendRedirect("main.jsp");
-		
-	} else if (result == 0) {
+		session.invalidate();
 		
 %>
+	<script type="text/javascript">
+		alert("탈퇴 완료.");
+		location.href = "main.jsp";
+	</script>
+	
+<%} else if (result == 0) { %>
 
 	<script type="text/javascript">
-		alert("암호 모름");
+		alert("암호 틀림. 다시 입력하세요.");
 		history.go(-1);
 	</script>
 
 <%} else { %>
 
 	<script type="text/javascript">
-		alert("User 존재하지 않음");
+		alert("ID 틀림");
 		history.go(-1);
 	</script>
-
+	
 <%} %>
 
 </body>
