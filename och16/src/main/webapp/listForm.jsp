@@ -50,13 +50,16 @@
 				<tr>
 				
 					<td>${startNum }</td>
-					<td class="left" width="200">
+					<td class="left" width=200>
 					
+						<!-- 조회수가 20 초과이면 -->
 						<c:if test="${board.readcount > 20 }">
 							<img src="images/hot.gif" onmouseover="getDeptName(${board.num})">
 						</c:if>
 						
+						<!-- 원글의 댓글이거나 대댓글이면 -->
 						<c:if test="${board.re_level > 0 }">
+							<!-- * 10 : 10px 곱한 만큼 들여쓰기 -->
 							<img src="images/level.gif" width="${board.re_level * 10 }">
 							<img src="images/re.gif">
 						</c:if>

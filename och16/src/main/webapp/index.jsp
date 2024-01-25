@@ -14,6 +14,9 @@
 	// location.href = "arrListTestForm.do";
 	location.href = "list.do";
 	
+	// /list.do=service.ListAction
+	// list.do로 가면 service 밑의 ListAction이 실행됨
+	
 </script>
 
 </body>

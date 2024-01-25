@@ -35,7 +35,7 @@
 		
 			<tr>
 				<td>아이디</td>
-				<td><%=id %><input type="hidden" class="id" name="id" id="id" value="<%=member.getId()%>"></td>
+				<td><%=id%><input type="hidden" class="id" name="id" id="id" value="<%=member.getId()%>"></td>
 			</tr>
 			
 			<tr>

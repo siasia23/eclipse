@@ -22,6 +22,8 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import com.mysql.cj.protocol.Resultset;
+
 // Singleton + DBCP > 메모리 절감, DOS 공격에 강함(?)
 public class MemberDao {
 
@@ -67,16 +69,18 @@ public class MemberDao {
 	// 1. 회원명단 : DB Connection 후 쿼리 설정 후 결과 값을 List로 생성 (List<Member2> list() Method)
 	public List<Member2> list() throws SQLException {
 			
+		// java에서 배열을 쓰면 크기를 지정하고 써야하는데, DB 데이터 개수를 모른다는 가정 하에,
+		// 배열 크기 지정이 필요 없는 collection (map, list..)을 써서 화면에 뿌린다.
+		List<Member2> list = new ArrayList<Member2>();
+		
 		Connection conn = getConnection();
 		
 		String sql = "select id, name, address, tel, reg_date from member2";
 		System.out.println("sql : " + sql);
 		
-		Statement stmt = conn.createStatement();
+		PreparedStatement pstmt = conn.prepareStatement(sql);
 		
-		ResultSet rs = stmt.executeQuery(sql);
-		
-		List<Member2> list = new ArrayList<Member2>();
+		ResultSet rs = pstmt.executeQuery(sql);
 		
 		while (rs.next()) {
 			
@@ -92,7 +96,8 @@ public class MemberDao {
 		
 		}
 		
-		stmt.close();
+		rs.close();
+		pstmt.close();
 		conn.close();
 		
 		return list;
@@ -147,7 +152,14 @@ public class MemberDao {
 			
 			return 0;
 			
-		} else return 1;
+		} else {
+			
+			pstmt.close();
+			conn.close();
+			
+			return 1;
+			
+		}
 		
 	}
 	
@@ -180,7 +192,8 @@ public class MemberDao {
 		
 		Connection conn = getConnection();
 		
-		String sql = "select passwd, name, address, tel, reg_date from member2 where id=?";
+		String sql = "select * from member2 where id=?";
+		System.out.println("id->"+id);
 		System.out.println("sql : " + sql);
 		
 		PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -190,6 +203,7 @@ public class MemberDao {
 		
 		if (rs.next()) {
 			
+			member.setId(rs.getString("id"));
 			member.setPasswd(rs.getString("passwd"));
 			member.setName(rs.getString("name"));
 			member.setAddress(rs.getString("address"));
@@ -198,10 +212,39 @@ public class MemberDao {
 			
 		}
 		
+		rs.close();
 		pstmt.close();
 		conn.close();
 		
 		return member;
+		
+	}
+	
+	// 4-2. 회원수정 : DB Connection 후 조회 후 수정(update Method)
+	public int update(Member2 member) throws SQLException {
+		
+		Connection conn = getConnection();
+		
+		String sql = "update member2 set passwd=?, name=?, address=?, tel=? where id=?";
+		System.out.println("getId->"+member.getId());
+		System.out.println("getName->"+member.getName());
+		System.out.println("getAddress->"+member.getAddress());
+		System.out.println("getTel->"+member.getTel());
+		System.out.println("sql : " + sql);
+		
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, member.getPasswd());
+		pstmt.setString(2, member.getName());
+		pstmt.setString(3, member.getAddress());
+		pstmt.setString(4, member.getTel());
+		pstmt.setString(5, member.getId());
+		
+		int result = pstmt.executeUpdate();
+		
+		pstmt.close();
+		conn.close();
+		
+		return result;
 		
 	}
 	

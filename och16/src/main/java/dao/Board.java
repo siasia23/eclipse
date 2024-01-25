@@ -5,7 +5,7 @@ import java.util.Date;
 // DTO
 public class Board {
 
-	private int num;
+	private int num;			// primary key
 	private String writer;
 	private String subject;
 	private String content;

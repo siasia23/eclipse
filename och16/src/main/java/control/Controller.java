@@ -37,6 +37,7 @@ public class Controller extends HttpServlet {
 	/**
 	 * @see Servlet#init(ServletConfig)
 	 */
+    // 톰캣 서버가 시작될 때 처음 딱 한 번 실행되는 init Method
 	public void init(ServletConfig config) throws ServletException {
 
 		// getInitParameter() : web.xml에서 propertyConfig에 해당하는 init-param의 값을 읽어옴
@@ -83,7 +84,7 @@ public class Controller extends HttpServlet {
 		}
 		
 		// pr.keySet() : 프로퍼티의 키들만 모아서
-		// 			/list.do /content.do
+		// 이 프로젝트에서 keyIter에 들어가는 값들 : /list.do /content.do
 		Iterator keyIter = pr.keySet().iterator();
 		
 		while (keyIter.hasNext()) {
@@ -95,24 +96,29 @@ public class Controller extends HttpServlet {
 			
 			try {
 				
+				/*	좀 더 단순한 또다른 방식
+				 * 
 				//  ListAction la = new ListAction();
 		        // 소멸 Class
 			//	Class  commandClass    = Class.forName(className);
 			//	Object commandInstance = commandClass.newInstance();
 				// new Class   --> 제네릭의 요점은 클래스 유형을 모른다
+				 * 
+				 */
 				
 				// 해당 문자열을 클래스로 만드는 명령어
 				Class<?> commandClass = Class.forName(className);	
 				
-				// 서비스를 객체로 만든다.
+				// 서비스를 인스턴스로 만든다.
 					// 여기서 의도한 것은 ListAction la = new ListAction();
 					// 하지만 실제 서비스는 여러 개일테니까 코드를 줄이기 위해 이 방식으로!
 				// .getDeclaredConstructor().newInstance() : 객체 만드는 메소드. jdbc 버전 올라가면서 메소드 바뀜 (api 참조)
 				CommandProcess commandInstance = 
 						(CommandProcess) commandClass.getDeclaredConstructor().newInstance();
 				
-							//          list.do    	service.ListAction
-							//         content.do  service.ContentAction
+				// 여기서 command, commandInstance에 들어가는 값들 : 
+				//          list.do    	service.ListAction
+				//         content.do  service.ContentAction
 				commandMap.put(command, commandInstance);
 				
 			} catch (Exception e) {
@@ -137,6 +143,7 @@ public class Controller extends HttpServlet {
 		requestServletPro(request, response);
 	}
 	
+	// doGet(), doPost()에서 호출할 하나의 method
 	protected void requestServletPro(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		String view = null;
@@ -147,13 +154,14 @@ public class Controller extends HttpServlet {
 		String command = request.getRequestURI();
 		System.out.println("1. requestServletPro command : " + command);
 		
-		// substring() : 불필요한 문자열 자르기
+		// substring() : 불필요한 문자열 자르기. 파라미터로 받는 것만큼만 남기고 나머지는 버림.
 		command = command.substring(request.getContextPath().length());
 		System.out.println("2. requestServletPro command substring : " + command);
 		
 		try {
 			
 			// service.ListAction Instance
+				// 인스턴스니까 hashcode 가짐
 			com = (CommandProcess) commandMap.get(command);
 			System.out.println("3. requestServletPro command : " + command);
 			System.out.println("4. requestServletPro com : " + com);
@@ -166,6 +174,7 @@ public class Controller extends HttpServlet {
 			throw new ServletException(e);
 		}
 		
+		// view단으로 이동!
 		RequestDispatcher dispatcher = request.getRequestDispatcher(view);
 		dispatcher.forward(request, response);
 				
