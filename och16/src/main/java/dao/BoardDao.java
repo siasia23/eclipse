@@ -16,6 +16,10 @@ import javax.sql.DataSource;
 
 // 1. ListAction
 // 2. ContentAction
+//	2-1. ContentAction, UpdateFormAction
+// 3. UpdateProAction
+// 4. WriteProAction
+// 5. DeleteProAction
 public class BoardDao {
 
 	private static BoardDao instance;
@@ -176,8 +180,6 @@ public class BoardDao {
 		
 		try {
 			
-			Board board = new Board();
-			
 			conn = getConnection();
 			pstmt = conn.prepareStatement(sql);
 			
@@ -199,7 +201,7 @@ public class BoardDao {
 		
 	}
 
-	// 2. ContentAction
+	// 2-1. ContentAction, UpdateFormAction, DeleteFormAction
 	// 클릭한 게시판의 내용 뿌리기
 	public Board select(int num) throws SQLException {
 		
@@ -248,6 +250,179 @@ public class BoardDao {
 		}
 		
 		return board;
+	}
+
+	// 3. UpdateProAction
+	// 게시판 내용 수정
+	public int update(Board board) throws SQLException {
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		int result = 0;
+		
+		String sql = "update board set subject=?, writer=?, email=?, passwd=?, content=? where num=?";
+		System.out.println("sql : " + sql);
+		
+		try {
+			
+			conn = getConnection();
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, board.getSubject());
+			pstmt.setString(2, board.getWriter());
+			pstmt.setString(3, board.getEmail());
+			pstmt.setString(4, board.getPasswd());
+			pstmt.setString(5, board.getContent());
+			pstmt.setInt(6, board.getNum());
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+			
+		} finally {
+			
+			if (pstmt != null) pstmt.close();
+			if (conn != null) conn.close();
+			
+		}
+		
+		return result;
+		
+	}
+
+	// 4. WriteProAction
+	// 게시판에 새 글쓰기
+	public int insert(Board board) throws SQLException {
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		int num = board.getNum();
+		int result = 0;
+		
+		// select 쿼리
+		String selectSQL = "select nvl(max(num), 0) from board";
+		System.out.println("selectSQL : " + selectSQL);
+		
+		// insert 쿼리
+		String insertSQL = "insert into board values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, sysdate) ";
+		System.out.println("insertSQL : " + insertSQL);
+		
+		// 댓글달기 update 쿼리
+		String updateSQL = "update board set re_step = re_step + 1 where ref=? and re_step > ?";
+		
+		try {
+			
+			conn = getConnection();
+			
+			// select 쿼리 삽입
+			pstmt = conn.prepareStatement(selectSQL);
+			rs = pstmt.executeQuery();
+			
+			rs.next();
+			
+			int number = rs.getInt(1) + 1;
+			
+			rs.close();
+			pstmt.close();
+			
+			// 댓글달기 update 쿼리 삽입
+			if (num != 0) {
+				
+				System.out.println("댓글 쿼리 updateSQL : " + updateSQL);
+				System.out.println("댓글 board.getRef() : " + board.getRef());
+				System.out.println("댓글 board.getRe_step() : " + board.getRe_step());
+				
+				pstmt = conn.prepareStatement(updateSQL);
+				
+				pstmt.setInt(1, board.getRef());
+				pstmt.setInt(2, board.getRe_step());
+				
+				pstmt.executeUpdate();
+				
+				pstmt.close();
+				
+				// 댓글 관련 정보
+				board.setRe_step(board.getRe_step()+1);
+				board.setRe_level(board.getRe_level()+1);
+				
+			}
+			
+			// 신규 글이면 num = ref 맞춰줌
+			if (num == 0) board.setRef(number);
+			
+			// insert 쿼리 삽입
+			pstmt = conn.prepareStatement(insertSQL);
+			
+			pstmt.setInt(1, number);
+			pstmt.setString(2, board.getWriter());
+			pstmt.setString(3, board.getSubject());
+			pstmt.setString(4, board.getContent());
+			pstmt.setString(5, board.getEmail());
+			pstmt.setInt(6, board.getReadcount());
+			pstmt.setString(7, board.getPasswd());
+			pstmt.setInt(8, board.getRef());
+			pstmt.setInt(9, board.getRe_step());
+			pstmt.setInt(10, board.getRe_level());
+			pstmt.setString(11, board.getIp());
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+			
+		} finally {
+			
+			if (rs != null) rs.close();
+			if (pstmt != null) pstmt.close();
+			if (conn != null) conn.close();
+			
+		}
+		
+		return result;
+	}
+
+
+	// 5. DeleteProAction
+	// 게시판 글 삭제
+	public int delete(int num, String passwd) throws SQLException {
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		int result = 0;
+		
+		try {
+			
+			conn = getConnection();
+			
+			String sql = "delete from board where num=? and passwd=?";
+			System.out.println("sql : " + sql);
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, num);
+			pstmt.setString(2, passwd);
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+			
+		} finally {
+			
+			if (pstmt != null) pstmt.close();
+			if (conn != null) conn.close();
+			
+		}
+		
+		return result;
 	}
 	
 }

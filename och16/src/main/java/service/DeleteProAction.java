@@ -3,36 +3,36 @@ package service;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import dao.Board;
 import dao.BoardDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class UpdateFormAction implements CommandProcess {
+public class DeleteProAction implements CommandProcess {
 
 	@Override
 	public String requestPro(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		System.out.println("UpdateFormAction Service start!");
-		
-		// 1. num, pageNum 가져오기
+		// HW 2
+		// 1. num , passwd , pageNum Get
 		int num = Integer.parseInt(request.getParameter("num"));
-		String pageNum = request.getParameter("PageNum");
+		String passwd = request.getParameter("passwd");
+		String pageNum = request.getParameter("pageNum");
 		
+		// 2. BoardDao bd Instance
+		BoardDao bd = BoardDao.getInstance();
+
 		try {
 			
-			// 2. BoardDao bd Instance
-			BoardDao bd = BoardDao.getInstance();
+			// 3. 본인의 게시판 만 삭제 
+			// HW3
+			int result = bd.delete(num, passwd);
 			
-			// 3. Board board = bd.select(num);
-			Board board = bd.select(num);
-			
-			// 4. request 객체에 num, pageNum, board
-			request.setAttribute("num", board.getNum());
+			// 4. request 객체에  num , pageNum ,result
+			request.setAttribute("num", num);
 			request.setAttribute("pageNum", pageNum);
-			request.setAttribute("board", board);
+			request.setAttribute("result", result);
 			
 		} catch (SQLException e) {
 			
@@ -40,8 +40,8 @@ public class UpdateFormAction implements CommandProcess {
 			System.out.println(e.getMessage());
 			
 		}
-		
-		return "updateForm.jsp";
+
+		return "deletePro.jsp";
 	}
 
 }

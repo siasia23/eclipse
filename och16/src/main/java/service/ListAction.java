@@ -18,10 +18,12 @@ public class ListAction implements CommandProcess {
 
 		System.out.println("ListAction Service start!");
 		
+		// DB와 작업하기 위해 DAO를 호출하자
 		BoardDao bd = BoardDao.getInstance();
 		
 		try {
 			
+			// paging 작업을 위해 total count를 가져오자
 			// Board row 개수 count
 			int totCnt = bd.getTotalCnt();		// 38
 			
@@ -48,6 +50,7 @@ public class ListAction implements CommandProcess {
 			// 공갈 page 방지
 			if (endPage > pageCnt) endPage = pageCnt;										// if (10 > 4) 
 			
+			// request.setAttribute() : 요청한 곳까지 파라미터 운반해줌
 			request.setAttribute("list", list);	// ***중요!!
 			request.setAttribute("totCnt", totCnt);
 			request.setAttribute("PageNum", PageNum);
@@ -58,16 +61,11 @@ public class ListAction implements CommandProcess {
 			request.setAttribute("startPage", startPage);
 			request.setAttribute("endPage", endPage);
 			
-			
-			
-			
-			
-			
-			
-			
 		} catch (SQLException e) {
+			
 			e.printStackTrace();
 			System.out.println(e.getMessage());
+			
 		}
 		
 		// MVC 중 View page 명칭

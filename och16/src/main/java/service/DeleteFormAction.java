@@ -9,39 +9,40 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class UpdateFormAction implements CommandProcess {
+public class DeleteFormAction implements CommandProcess {
 
 	@Override
 	public String requestPro(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		System.out.println("UpdateFormAction Service start!");
+		System.out.println("DeleteFormAction Start!");
 		
-		// 1. num, pageNum 가져오기
+		// HW1
+		// 1. num , pageNum Get
 		int num = Integer.parseInt(request.getParameter("num"));
-		String pageNum = request.getParameter("PageNum");
-		
-		try {
+		String pageNum = request.getParameter("pageNum");
 			
+		try {
+				
 			// 2. BoardDao bd Instance
 			BoardDao bd = BoardDao.getInstance();
-			
+				
 			// 3. Board board = bd.select(num);
 			Board board = bd.select(num);
-			
-			// 4. request 객체에 num, pageNum, board
-			request.setAttribute("num", board.getNum());
+				
+			// 4. request 객체에  num , pageNum ,board
+			request.setAttribute("num", num);
 			request.setAttribute("pageNum", pageNum);
 			request.setAttribute("board", board);
-			
+				
 		} catch (SQLException e) {
-			
+
 			e.printStackTrace();
 			System.out.println(e.getMessage());
-			
+				
 		}
-		
-		return "updateForm.jsp";
+			
+		return "deleteForm.jsp";
 	}
 
 }

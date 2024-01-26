@@ -52,14 +52,15 @@ public class Controller extends HttpServlet {
 		try {
 			
 			// getRealPath() : 파라미터로 받은 파일의 metadata 가져옴
-			// 배포한 서버의 경로를 읽어들이기 위해?
+				// 배포한 서버의 경로를 여기서 한 번에 읽어들이기 위해
+				// 배포할때마다 경로가 달라져서
 			String configFilePath = config.getServletContext().getRealPath(props);
 			System.out.println("2. init String configFilePath : " + configFilePath);
 			
 			// 가져온 경로와 metadata로 file 생성
 			f = new FileInputStream(configFilePath);
 			
-			// Memory Up
+			// Memory Up : 메모리에 올라가야 CPU를 받아서 처리 가능해짐
 				// key = /list.do
 				// value = service.ListAction
 			pr.load(f);
@@ -84,7 +85,7 @@ public class Controller extends HttpServlet {
 		}
 		
 		// pr.keySet() : 프로퍼티의 키들만 모아서
-		// 이 프로젝트에서 keyIter에 들어가는 값들 : /list.do /content.do
+		// 이 프로젝트에서 keyIter에 들어가는 값들 : /list.do /content.do /updateForm.do
 		Iterator keyIter = pr.keySet().iterator();
 		
 		while (keyIter.hasNext()) {
@@ -106,6 +107,8 @@ public class Controller extends HttpServlet {
 				 * 
 				 */
 				
+			//  ListAction la = new ListAction(); 를 아래 두 줄의 코드(라인 113, 119)로 표현해보자
+				
 				// 해당 문자열을 클래스로 만드는 명령어
 				Class<?> commandClass = Class.forName(className);	
 				
@@ -122,7 +125,10 @@ public class Controller extends HttpServlet {
 				commandMap.put(command, commandInstance);
 				
 			} catch (Exception e) {
+				
 				e.printStackTrace();
+				System.out.println(e.getMessage());
+				
 			}
 			
 		}
@@ -148,12 +154,14 @@ public class Controller extends HttpServlet {
 		
 		String view = null;
 		
-		// Interface
+		// 표준화를 위해 내가 만든 Interface
 		CommandProcess com = null;
 		
+		// service를 command라고 부르기도 함
 		String command = request.getRequestURI();
 		System.out.println("1. requestServletPro command : " + command);
 		
+		// 가져온 URI에서 필요 없는건 버리자
 		// substring() : 불필요한 문자열 자르기. 파라미터로 받는 것만큼만 남기고 나머지는 버림.
 		command = command.substring(request.getContextPath().length());
 		System.out.println("2. requestServletPro command substring : " + command);
@@ -174,6 +182,7 @@ public class Controller extends HttpServlet {
 			throw new ServletException(e);
 		}
 		
+		// Controller가 Service에서 View를 받아서 페이지 이동시켜줌
 		// view단으로 이동!
 		RequestDispatcher dispatcher = request.getRequestDispatcher(view);
 		dispatcher.forward(request, response);
