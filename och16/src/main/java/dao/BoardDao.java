@@ -223,6 +223,8 @@ public class BoardDao {
 			
 			rs = pstmt.executeQuery();
 			
+			// num이 pk여서 if문 씀.
+			// pk 아니라면, do-while문 쓰는게 좋음
 			if (rs.next()) {
 				
 				board.setNum(num);
@@ -386,7 +388,6 @@ public class BoardDao {
 		
 		return result;
 	}
-
 
 	// 5. DeleteProAction
 	// 게시판 글 삭제
